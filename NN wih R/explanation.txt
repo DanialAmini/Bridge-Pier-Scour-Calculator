@@ -1,0 +1,14 @@
+2	T'/y	bpc/y	bpg/y	be/b*
+Case	x1	x2	x3	z
+
+3	f1/bcol	h'0/y	bcol/y	bpc/y	bpg/y	be/b*
+Case	x1	x2	x3	x4	x5	z
+
+case 4	x1	x2	x3	x4	z
+-	f1/bcol	h1'/b*	bcol/y	h'0/y	be/b*
+
+5	f1/bcol	h1'/b*	bcol/y	be/b*
+Case	x1	x2	x3	z
+
+
+b* = average with use of ys_hec
