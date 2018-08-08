@@ -1,4 +1,0 @@
-using heuristics lab
-
-gp is made
-
