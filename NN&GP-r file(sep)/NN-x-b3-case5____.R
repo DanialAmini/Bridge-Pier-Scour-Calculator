@@ -1,4 +1,4 @@
-
+graphics.off()
 #
 #
 #
@@ -63,25 +63,38 @@ printNN <- function(model)
 
 #print(net.sum$weights)
 
-MyData = read.csv("NN-x-b3-case2.txt",header=TRUE)
-MyData2 = read.csv("case2-test.txt",header=TRUE)
+#MyData = read.csv("NN-x-b3-case4.txt",header=TRUE)
+#MyData2 = read.csv("case4-test.txt",header=TRUE)
+
+MyData = read.csv("NN-x-b3-case5.txt",header=TRUE)
+MyData2 = read.csv("case5-test.txt",header=TRUE)
 #MyData
 
 cat("number of data = ",length(MyData[,1]),"\n")
 
-MyData$x2=NULL
-MyData$x4=NULL
-MyData$x5=NULL
-MyData$x7=NULL
+MyData$x1=NULL  #case5
+MyData$x3=NULL  #case5
 
-MyData2$x2=NULL
-MyData2$x4=NULL
-MyData2$x5=NULL
-MyData2$x7=NULL
+MyData2$x1=NULL #case5
+MyData2$x3=NULL #case5
+
+#MyData$x2=NULL  #case2
+#MyData$x4=NULL  #case2
+#MyData$x5=NULL  #case2
+#MyData$x7=NULL  #case2
+
+#MyData2$x2=NULL #case2
+#MyData2$x4=NULL #case2
+#MyData2$x5=NULL #case2
+#MyData2$x7=NULL #case2
 
 #MyData
 
-names_vec=c('x1','x3','x6')
+#names_vec=c('x1','x3','x6') #case2
+#names_vec=c('x1','x2','x3','x4','x5','x6','x7') #case3,4
+names_vec=c('x2','x4','x5','x6','x7') #case5
+
+
 a <- as.formula(paste('z ~ ' ,paste(names_vec,collapse='+')))
 a
 model <- lm(a,data=MyData)
@@ -112,7 +125,7 @@ length(names_vec)
 plotter_ <- function(){
 
 	graphics.off()
-	dev.new()
+	dev.new(xpos=600,width=4.5,height=4.5)
 
 	axislimit_u= max( max(MyData$z),max(pr.nn[[2]]))
 	axislimit_l= min( min(MyData$z),min(pr.nn[[2]]),0)
@@ -121,8 +134,9 @@ plotter_ <- function(){
 	lines(c(0,axislimit_u),c(0,axislimit_u),col="red")
 	lines(c(0,axislimit_u),c(0,axislimit_u*1.2),lty=2,col="red")
 	lines(c(0,axislimit_u),c(0,axislimit_u*.8),lty=2,col="red")
+	title(paste("train-rmse",round(rmse1,2)))
 
-	dev.new(xpos=100)
+	dev.new(xpos=50,width=4.5,height=4.5)
 
 	axislimit_u= max( max(MyData2$z),max(pr.nn2[[2]]))
 	axislimit_l= min( min(MyData2$z),min(pr.nn2[[2]]),0)
@@ -131,13 +145,19 @@ plotter_ <- function(){
 	lines(c(0,axislimit_u),c(0,axislimit_u),col="red")
 	lines(c(0,axislimit_u),c(0,axislimit_u*1.2),lty=2,col="red")
 	lines(c(0,axislimit_u),c(0,axislimit_u*.8),lty=2,col="red")
+	title(paste("test-rmse=",round(rmse2,2)))
 
 }
 
+library("NeuralNetTools")
+
 #############################################
+
+while(0<1){
 i=0
-while(i<250){
-	net.sum <- neuralnet(a,data=MyData,hidden=2,act.fct="logistic");
+while(i+0*25000<250){
+	i=i+1
+	net.sum <- neuralnet(a,data=MyData,hidden=3,act.fct="logistic");
 	pr.nn <- compute(net.sum,MyData[,1:length(names_vec)]);
 	if(rmsee(MyData$z-pr.nn[[2]])<kkk){
 		#print(rmsee(MyData$z-pr.nn[[2]]))
@@ -151,21 +171,34 @@ while(i<250){
 		#print(net.sum$weights)
 		printNN(net.sum)
 		plotter_()
+
+		if ( i > 40 && rmse2>0.165) {
+			break
+		}
+		if (rmse2<0.165 && rmse1<0.11){
+			plotter_()
+
+			dev.new(xpos=1050,width=5,height=6)
+			plotnet(net.sum)
+
+
+			dev.new(ypos=500,xpos=1320,width=2, height=2)
+			garson(net.sum)
+
+			printNN(net.sum)
+
+			break
+		}
 	}
+}
+if (rmse2<0.165){
+break
+}
 }
 
 #pr.nn
 #as.numeric(pr.nn)
 #############################################
 
-#1 0.16 0.20
-#2 0.12 0.18
-#3 0.09 0.07
- 
 
 
-
-del_var='x8'
-names_vec=names_vec[!is.element(names_vec, c(del_var))]
-MyData[which( colnames(MyData)==del_var )] <- NULL
-a <- as.formula(paste('z ~ ' ,paste(names_vec,collapse='+')))

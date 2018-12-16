@@ -1,5 +1,6 @@
+graphics.off()
 
-setwd("C:/Users/Computer Emergency/Desktop/scourpaper/Complex-Bridge-Pier-Scour-Calculator-1.0/ANFIS-r files")  #set working folder
+setwd("C:/Users/Computer Emergency/Desktop/scourpaper/Complex-Bridge-Pier-Scour-Calculator-1.0/ANFIS-r files/anfis_case")  #set working folder
 
 rmse <- function(error)
 {
@@ -8,42 +9,49 @@ rmse <- function(error)
 #x1 log(bpg/bpc+.05)	x2 log(bcol/bpc+.05)	x3 log(h0/y+2.1)	x4 log(h1/y+1.55)	
 #x5 log(T/y+.05)	x6 log(bpc/y)	x7 log(f1/bcol+.05)	z log(be/b*+.05)
 
-MyData = read.csv("anfis-log_x_b3.txt",header=TRUE)
-MyData2 = read.csv("test_data.txt",header=TRUE)
+MyData = read.csv("case2-train.txt",header=TRUE)
+MyData2 = read.csv("case2-test.txt",header=TRUE)
+
+#MyData$x1=NULL  #case5
+#MyData$x3=NULL  #case5
+
+#MyData2$x1=NULL #case5
+#MyData2$x3=NULL #case5
+
+MyData$x2=NULL  #case2
+MyData$x4=NULL  #case2
+MyData$x5=NULL  #case2
+MyData$x7=NULL  #case2
+
+MyData2$x2=NULL #case2
+MyData2$x4=NULL #case2
+MyData2$x5=NULL #case2
+MyData2$x7=NULL #case2
 
 
 library("anfis")
 require("parallel")
 if(.Platform$OS.type == "windows"){
-options(mc.cores=5)
+options(mc.cores=5)	
 }else{
 options(mc.cores=5) 
 }
 
 membershipFunction<-list(
-x1m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.91,sigma=.2)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=-.25,sigma=.2))),
+x1m=c(#new(Class="NormalizedGaussianMF",parameters=c(mu=0.25 ,sigma=0.15)),
+       new(Class="NormalizedGaussianMF",parameters=c(mu=0.6  ,sigma=0.15))),
 
-x2m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-1.3,sigma=0.4)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=.02,sigma=0.4))),
+x3m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-0  ,sigma=0.3)),
+       new(Class="NormalizedGaussianMF",parameters=c(mu=1   ,sigma=0.3))),
 
-x3m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.29,sigma=0.80))),
+x6m=c(#new(Class="NormalizedGaussianMF",parameters=c(mu=0.5,sigma=.3)),
+      new(Class="NormalizedGaussianMF",parameters=c(mu=1.5,sigma=.3))))
 
-x4m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.00,sigma=0.1)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=.24,sigma=0.1)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=.41,sigma=0.1))),
+X=MyData[,1:3]
+Y=MyData[,4,drop=FALSE]
 
-x5m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.48,sigma=0.50))),
-
-x6m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.13,sigma=0.78))),
-
-x7m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.27,sigma=0.5))))
-
-X=MyData[,1:7]
-Y=MyData[,8,drop=FALSE]
-
-X2=MyData2[,1:7]
-Y2=MyData2[,8,drop=FALSE]
+X2=MyData2[,1:3]
+Y2=MyData2[,4,drop=FALSE]
 
 X= as.matrix(as.data.frame(lapply(X, as.numeric)))
 typeof(X)
@@ -55,7 +63,7 @@ Y2= as.matrix(as.data.frame(lapply(Y2, as.numeric)))
 
 anfis3 <- new(Class="ANFIS",X,Y,membershipFunction)
 
-trainOutput <- trainHybridJangOffLine(anfis3, epochs=10)
+trainOutput <- trainHybridJangOffLine(anfis3, epochs=20)
 
 
 summary(anfis3)
@@ -93,11 +101,11 @@ err2
 	lines(c(0,axislimit_u),c(0,axislimit_u*.8),lty=2,col="red")
 	title(paste("test-rmse=",round(err2,2)))
 
+	dev.new()
 
 
 
-
-vars=7
+vars=3
 
 
 list_coef=coef(anfis3)$consequents
@@ -162,3 +170,66 @@ cat(str2)
 fitted.values(anfis3)
 
 plotMFs(anfis3)
+
+#case3
+#archi  rmsetrain test
+#1111111 0.18 0.14
+#2111111 0.18 0.12
+#1211111 0.16 0.16
+#1121111 0.17 0.13
+#1112111 0.17 0.13
+#1111211 0.17 0.15
+#1111121 0.14 0.11
+#1111112 0.18 0.13
+#1211121 0.10 0.07
+
+#case4
+#archi  rmsetrain test
+#1111111 0.31 0.30
+#2111111 0.27 0.31
+#1211111 0.26 0.28
+#1121111 0.30 0.30
+#1112111 0.28 0.27
+#1111211 0.28 0.27
+#1111121 0.26 0.26
+#1111112 0.27 0.27
+
+#1211121 0.24 0.28
+#1111122 0.29 0.24
+#1112112 0.21 0.28
+#2111121 0.23 0.28
+#1111221 0.21 0.21 **
+#1121211 0.28 0.25
+#1121121 0.29 0.28
+
+#1111131 0.19 0.23
+
+#1111222 0.19 0.23
+#2211121 0.21 0.27
+
+#case 5
+#0101111 0.21 0.24
+#0201111 0.18 0.26
+#0102111 0.20 0.25
+#0101211 0.19 0.21
+#0101121 0.16 0.20 sigma=0.5
+#0101112 0.18 0.26
+
+#0101131 0.14 0.21
+#0301111 0.16 0.18
+#0103111 0.18 0.25
+#0101311 0.16 0.20
+#0101113 0.16 0.24
+
+#0101221 0.19 0.20
+#0201121 0.14 0.20
+#0102121 0.17 0.24
+#0101122 0.32 0.27
+
+#case 6
+#1010010 0.16 0.22
+#2010010 0.16 0.20
+#1020010 0.14 0.15
+#1010020 0.16 0.20
+
+predictedY

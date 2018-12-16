@@ -21,8 +21,7 @@ options(mc.cores=5)
 }
 
 membershipFunction<-list(
-x1m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.91,sigma=.2)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=-.25,sigma=.2))),
+x1m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.91,sigma=.2))),
 
 x2m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-1.3,sigma=0.4)),
       new(Class="NormalizedGaussianMF",parameters=c(mu=.02,sigma=0.4))),
@@ -30,7 +29,6 @@ x2m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-1.3,sigma=0.4)),
 x3m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.29,sigma=0.80))),
 
 x4m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.00,sigma=0.1)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=.24,sigma=0.1)),
       new(Class="NormalizedGaussianMF",parameters=c(mu=.41,sigma=0.1))),
 
 x5m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.48,sigma=0.50))),
@@ -93,7 +91,7 @@ err2
 	lines(c(0,axislimit_u),c(0,axislimit_u*.8),lty=2,col="red")
 	title(paste("test-rmse=",round(err2,2)))
 
-
+	dev.new()
 
 
 

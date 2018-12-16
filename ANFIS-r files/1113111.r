@@ -21,11 +21,9 @@ options(mc.cores=5)
 }
 
 membershipFunction<-list(
-x1m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.91,sigma=.2)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=-.25,sigma=.2))),
+x1m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.91,sigma=.2))),
 
-x2m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-1.3,sigma=0.4)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=.02,sigma=0.4))),
+x2m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-1.3,sigma=0.4))),
 
 x3m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.29,sigma=0.80))),
 

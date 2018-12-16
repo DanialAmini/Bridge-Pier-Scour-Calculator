@@ -1,5 +1,6 @@
+graphics.off()
 
-setwd("C:/Users/Computer Emergency/Desktop/scourpaper/Complex-Bridge-Pier-Scour-Calculator-1.0/ANFIS-r files")  #set working folder
+setwd("C:/Users/Computer Emergency/Desktop/scourpaper/Complex-Bridge-Pier-Scour-Calculator-1.0/ANFIS-r files/anfis_case")  #set working folder
 
 rmse <- function(error)
 {
@@ -8,36 +9,39 @@ rmse <- function(error)
 #x1 log(bpg/bpc+.05)	x2 log(bcol/bpc+.05)	x3 log(h0/y+2.1)	x4 log(h1/y+1.55)	
 #x5 log(T/y+.05)	x6 log(bpc/y)	x7 log(f1/bcol+.05)	z log(be/b*+.05)
 
-MyData = read.csv("anfis-log_x_b3.txt",header=TRUE)
-MyData2 = read.csv("test_data.txt",header=TRUE)
+MyData = read.csv("case3-train.txt",header=TRUE)
+MyData2 = read.csv("case3-test.txt",header=TRUE)
 
 
 library("anfis")
 require("parallel")
 if(.Platform$OS.type == "windows"){
-options(mc.cores=5)
+options(mc.cores=5)	
 }else{
 options(mc.cores=5) 
 }
 
 membershipFunction<-list(
-x1m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.91,sigma=.2)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=-.25,sigma=.2))),
+x1m=c(#new(Class="NormalizedGaussianMF",parameters=c(mu=0.12,sigma=0.15)),
+      new(Class="NormalizedGaussianMF",parameters=c(mu=0.69,sigma=0.15))),
 
-x2m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-1.3,sigma=0.4)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=.02,sigma=0.4))),
+x2m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=0.18,sigma=0.15)),
+      new(Class="NormalizedGaussianMF",parameters=c(mu=0.85,sigma=0.15))),
 
-x3m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.29,sigma=0.80))),
+x3m=c(#new(Class="NormalizedGaussianMF",parameters=c(mu=0.00,sigma=0.2)),
+      new(Class="NormalizedGaussianMF",parameters=c(mu=0.88,sigma=0.2))),
 
-x4m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.00,sigma=0.1)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=.24,sigma=0.1)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=.41,sigma=0.1))),
+x4m=c(#new(Class="NormalizedGaussianMF",parameters=c(mu=.00,sigma=0.2)),
+      new(Class="NormalizedGaussianMF",parameters=c(mu=0.95,sigma=0.2))),
 
-x5m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.48,sigma=0.50))),
+x5m=c(#new(Class="NormalizedGaussianMF",parameters=c(mu=0.0,sigma=0.1)),
+      new(Class="NormalizedGaussianMF",parameters=c(mu=0.6,sigma=0.1))),
 
-x6m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.13,sigma=0.78))),
+x6m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=0.2,sigma=0.4)),
+      new(Class="NormalizedGaussianMF",parameters=c(mu=1.5,sigma=0.4))),
 
-x7m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.27,sigma=0.5))))
+x7m=c(#new(Class="NormalizedGaussianMF",parameters=c(mu=0.0,sigma=0.35)),
+      new(Class="NormalizedGaussianMF",parameters=c(mu=1.83,sigma=0.35))))
 
 X=MyData[,1:7]
 Y=MyData[,8,drop=FALSE]
@@ -93,7 +97,7 @@ err2
 	lines(c(0,axislimit_u),c(0,axislimit_u*.8),lty=2,col="red")
 	title(paste("test-rmse=",round(err2,2)))
 
-
+	dev.new()
 
 
 
@@ -162,3 +166,16 @@ cat(str2)
 fitted.values(anfis3)
 
 plotMFs(anfis3)
+
+#case3
+#archi  rmsetrain test
+#1111111 0.18 0.14
+#2111111 0.18 0.12
+#1211111 0.16 0.16
+#1121111 0.17 0.13
+#1112111 0.17 0.13
+#1111211 0.17 0.15
+#1111121 0.14 0.11
+#1111112 0.18 0.13
+#1211121 0.10 0.07
+

@@ -1,0 +1,576 @@
+> 
+> setwd("C:/Users/Computer Emergency/Desktop/scourpaper/Complex-Bridge-Pier-Scour-Calculator-1.0/ANFIS-r files")  #set working folder
+> 
+> rmse <- function(error)
++ {
++   sqrt(mean(error^2))
++ }
+> #x1 log(bpg/bpc+.05)x2 log(bcol/bpc+.05)x3 log(h0/y+2.1)x4 log(h1/y+1.55)
+> #x5 log(T/y+.05)x6 log(bpc/y)x7 log(f1/bcol+.05)z log(be/b*+.05)
+> 
+> MyData = read.csv("anfis-log_x_b3.txt",header=TRUE)
+> MyData2 = read.csv("test_data.txt",header=TRUE)
+> 
+> 
+> library("anfis")
+> require("parallel")
+> if(.Platform$OS.type == "windows"){
++ options(mc.cores=5)
++ }else{
++ options(mc.cores=5) 
++ }
+> 
+> membershipFunction<-list(
++ x1m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.91,sigma=.2))),
++ 
++ x2m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-1.3,sigma=0.4))),
++ 
++ x3m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.29,sigma=0.80))),
++ 
++ x4m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.00,sigma=0.1))),
++ 
++ x5m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.48,sigma=0.50))),
++ 
++ x6m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.13,sigma=0.78))),
++ 
++ x7m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.27,sigma=0.5))))
+> 
+> X=MyData[,1:7]
+> Y=MyData[,8,drop=FALSE]
+> 
+> X2=MyData2[,1:7]
+> Y2=MyData2[,8,drop=FALSE]
+> 
+> X= as.matrix(as.data.frame(lapply(X, as.numeric)))
+> typeof(X)
+[1] "double"
+> typeof(Y)
+[1] "list"
+> Y= as.matrix(as.data.frame(lapply(Y, as.numeric)))
+> 
+> X2= as.matrix(as.data.frame(lapply(X2, as.numeric)))
+> Y2= as.matrix(as.data.frame(lapply(Y2, as.numeric)))
+> 
+> anfis3 <- new(Class="ANFIS",X,Y,membershipFunction)
+> 
+> trainOutput <- trainHybridJangOffLine(anfis3, epochs=10)
+[1] "epoch:  1"
+[1] "epoch:  2"
+[1] "epoch:  3"
+[1] "epoch:  4"
+[1] "epoch:  5"
+[1] "epoch:  6"
+[1] "epoch:  7"
+[1] "epoch:  8"
+[1] "epoch:  9"
+> 
+> 
+> summary(anfis3)
+ANFIS network 
+Trainning Set: 
+         dim(x)= 279x7 
+         dim(y)= 279x1 
+Arquitecture:  7 ( 1x1x1x1x1x1x1 ) - 1 - 8 ( 8x1 ) - 1 
+Last training error:  7.364649 
+
+Call: trainHybridJangOffLine(object = anfis3, epochs = 10)
+
+Statistics for Off-line training
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  7.365   7.365   7.365   7.365   7.365   7.365 
+> coef(anfis3)
+$`premises`
+$`premises`$`x1m`
+$`premises`$`x1m`[[1]]
+MembershipFunction:  Normalized Gaussian Membership Function 
+Number of parameters: 2 
+   mu sigma 
+-0.91  0.20 
+Expression: expression(exp(-1/2 * ((x - mu)/sigma)^2))
+
+
+$`premises`$x2m
+$`premises`$x2m[[1]]
+MembershipFunction:  Normalized Gaussian Membership Function 
+Number of parameters: 2 
+   mu sigma 
+ -1.3   0.4 
+Expression: expression(exp(-1/2 * ((x - mu)/sigma)^2))
+
+
+$`premises`$x3m
+$`premises`$x3m[[1]]
+MembershipFunction:  Normalized Gaussian Membership Function 
+Number of parameters: 2 
+   mu sigma 
+ 0.29  0.80 
+Expression: expression(exp(-1/2 * ((x - mu)/sigma)^2))
+
+
+$`premises`$x4m
+$`premises`$x4m[[1]]
+MembershipFunction:  Normalized Gaussian Membership Function 
+Number of parameters: 2 
+   mu sigma 
+  0.0   0.1 
+Expression: expression(exp(-1/2 * ((x - mu)/sigma)^2))
+
+
+$`premises`$x5m
+$`premises`$x5m[[1]]
+MembershipFunction:  Normalized Gaussian Membership Function 
+Number of parameters: 2 
+   mu sigma 
+-0.48  0.50 
+Expression: expression(exp(-1/2 * ((x - mu)/sigma)^2))
+
+
+$`premises`$x6m
+$`premises`$x6m[[1]]
+MembershipFunction:  Normalized Gaussian Membership Function 
+Number of parameters: 2 
+   mu sigma 
+-0.13  0.78 
+Expression: expression(exp(-1/2 * ((x - mu)/sigma)^2))
+
+
+$`premises`$x7m
+$`premises`$x7m[[1]]
+MembershipFunction:  Normalized Gaussian Membership Function 
+Number of parameters: 2 
+   mu sigma 
+ 0.27  0.50 
+Expression: expression(exp(-1/2 * ((x - mu)/sigma)^2))
+
+
+
+$consequents
+               z
+[1,] -0.04745969
+[2,]  0.16176464
+[3,]  0.41326471
+[4,] -0.32467603
+[5,] -0.03689604
+[6,] -0.02742315
+[7,] -0.11668927
+[8,] -0.18773257
+
+> 
+> predictedY <- predict(anfis3,X)
+> err=rmse(MyData$z-predictedY)
+> err
+[1] 0.1624703
+> 
+> 
+> predictedY2 <- predict(anfis3,X2)
+> err2=rmse(MyData2$z-predictedY2)
+> err2
+[1] 1.100716
+> 
+> graphics.off()
+> dev.new()
+> 
+> axislimit_u= max( max(MyData$z),max(predictedY))
+> axislimit_l= min( min(MyData$z),min(predictedY),0)
+> xlim_=c(axislimit_l,axislimit_u)
+> plot(MyData$z,predictedY,xlim=xlim_,ylim=xlim_)
+> lines(c(0,axislimit_u),c(0,axislimit_u),col="red")
+> lines(c(0,axislimit_u),c(0,axislimit_u*1.2),lty=2,col="red")
+> lines(c(0,axislimit_u),c(0,axislimit_u*.8),lty=2,col="red")
+> title(paste("train-rmse",round(err,2)))
+> 
+> dev.new(xpos=100)
+> 
+> axislimit_u= max( max(MyData2$z),max(predictedY2))
+> axislimit_l= min( min(MyData2$z),min(predictedY2),0)
+> xlim_=c(axislimit_l,axislimit_u)
+> plot(MyData2$z,predictedY2,xlim=xlim_,ylim=xlim_)
+> lines(c(0,axislimit_u),c(0,axislimit_u),col="red")
+> lines(c(0,axislimit_u),c(0,axislimit_u*1.2),lty=2,col="red")
+> lines(c(0,axislimit_u),c(0,axislimit_u*.8),lty=2,col="red")
+> title(paste("test-rmse=",round(err2,2)))
+> 
+> dev.new()
+> 
+> 
+> 
+> vars=7
+> 
+> 
+> list_coef=coef(anfis3)$consequents
+> 
+> no_functions=length(list_coef)/(vars+1)
+> 
+> for (i in 1:no_functions)
++ {
++ if(i==1){cat("\n")}
++ str=i
++ str=paste('z',i,'=',list_coef[(i-1)*(vars+1)+vars+1], sep = '')
++ for (j in 1:vars)
++ {
++ str=paste(str,'+',list_coef[(i-1)*(vars+1)+j],'*x',j, sep = '')
++ }
++ str=paste(str,"\n")
++ cat(str)
++ if(i==no_functions){cat("\n")}
++ }
+
+z1=-0.187732566595746+-0.0474596865159321*x1+0.161764642497841*x2+0.413264710962978*x3+-0.324676032701193*x4+-0.0368960438376346*x5+-0.0274231475564239*x6+-0.116689267442742*x7 
+
+> 
+> 
+> list_coef
+               z
+[1,] -0.04745969
+[2,]  0.16176464
+[3,]  0.41326471
+[4,] -0.32467603
+[5,] -0.03689604
+[6,] -0.02742315
+[7,] -0.11668927
+[8,] -0.18773257
+> 
+> 
+> for (i in 1:vars){
++ if(i==1){cat("\n")}
++ #if(length(membershipFunction[[i]])>1){
++ for (j in 1:length(membershipFunction[[i]])){
++ str=""
++ mu__=getPremises(anfis3)[[i]][[j]][1][[1]]
++ stdev__=getPremises(anfis3)[[i]][[j]][2][[1]]
++ str=paste(str,"w",i,'_',j,"=exp(-0.5*(x",i,"-",mu__,") ^ 2/",stdev__," ^ 2)",sep="")
++ cat(str,"\n")
++ }
++ cat("\n")
++ #}
++ }
+
+w1_1=exp(-0.5*(x1--0.91) ^ 2/0.2 ^ 2) 
+
+w2_1=exp(-0.5*(x2--1.3) ^ 2/0.4 ^ 2) 
+
+w3_1=exp(-0.5*(x3-0.29) ^ 2/0.8 ^ 2) 
+
+w4_1=exp(-0.5*(x4-0) ^ 2/0.1 ^ 2) 
+
+w5_1=exp(-0.5*(x5--0.48) ^ 2/0.5 ^ 2) 
+
+w6_1=exp(-0.5*(x6--0.13) ^ 2/0.78 ^ 2) 
+
+w7_1=exp(-0.5*(x7-0.27) ^ 2/0.5 ^ 2) 
+
+> 
+> for (i in 1:no_functions){
++ str=paste('ww',i,'=',sep='')
++ for (j in 1:vars){
++ str=paste(str,'w',j,'_',getRules(anfis3)[i,j],sep='')
++ if(j<vars){str=paste(str,'*',sep='')}
++ }
++ cat(str,"\n")
++ }
+ww1=w1_1*w2_1*w3_1*w4_1*w5_1*w6_1*w7_1 
+> 
+> str='\nwwN='
+> str2='\nz='
+> for (i in 1:no_functions){
++ str=paste(str,'ww',i,sep='')
++ str2=paste(str2,'z',i,'*ww',i,sep='')
++ if(i<no_functions){str=paste(str,'+',sep='')}
++ if(i<no_functions){str2=paste(str2,'+',sep='')}
++ }
+> str=paste(str,'\n\n')
+> str2=paste(str2,'\n\n')
+> 
+> cat(str)
+
+wwN=ww1 
+
+> cat(str2)
+
+z=z1*ww1 
+
+> 
+> fitted.values(anfis3)
+                  z
+  [1,] -0.138233614
+  [2,] -0.127325037
+  [3,] -0.129065562
+  [4,] -0.133896725
+  [5,] -0.138579536
+  [6,] -0.120632957
+  [7,] -0.107051363
+  [8,] -0.152605364
+  [9,] -0.137271673
+ [10,] -0.127688514
+ [11,] -0.128464430
+ [12,] -0.139180667
+ [13,] -0.136897226
+ [14,] -0.148266162
+ [15,] -0.158657676
+ [16,] -0.165022614
+ [17,] -0.180619935
+ [18,] -0.195282015
+ [19,] -0.165389286
+ [20,] -0.187466701
+ [21,] -0.207700327
+ [22,] -0.162155520
+ [23,] -0.133628713
+ [24,] -0.163844581
+ [25,] -0.179899647
+ [26,] -0.187581711
+ [27,] -0.195174107
+ [28,] -0.202744719
+ [29,] -0.210346099
+ [30,] -0.218021457
+ [31,] -0.221898756
+ [32,] -0.143828627
+ [33,] -0.145993512
+ [34,] -0.110713985
+ [35,] -0.159759094
+ [36,] -0.159759094
+ [37,] -0.159562516
+ [38,] -0.160558321
+ [39,] -0.156298663
+ [40,] -0.156799924
+ [41,] -0.156349460
+ [42,] -0.122249041
+ [43,] -0.121103564
+ [44,] -0.116413766
+ [45,] -0.117005052
+ [46,] -0.117235955
+ [47,] -0.116738142
+ [48,] -0.186629295
+ [49,] -0.186066098
+ [50,] -0.184065618
+ [51,] -0.189152008
+ [52,] -0.190749596
+ [53,] -0.192190076
+ [54,] -0.186042832
+ [55,] -0.187667684
+ [56,] -0.193529325
+ [57,] -0.191432187
+ [58,] -0.192419326
+ [59,] -0.184574990
+ [60,] -0.185306477
+ [61,] -0.186608400
+ [62,] -0.187389046
+ [63,] -0.185224840
+ [64,] -0.193720074
+ [65,] -0.194465132
+ [66,] -0.197954928
+ [67,] -0.203531058
+ [68,] -0.130672261
+ [69,] -0.131587662
+ [70,] -0.132177438
+ [71,] -0.132002217
+ [72,] -0.132072609
+ [73,] -0.010773510
+ [74,] -0.027588797
+ [75,] -0.026242479
+ [76,] -0.194078880
+ [77,] -0.192361910
+ [78,] -0.109565766
+ [79,] -0.108433183
+ [80,] -0.107178963
+ [81,] -0.180078778
+ [82,] -0.178980042
+ [83,] -0.176245662
+ [84,] -0.079555150
+ [85,] -0.139443976
+ [86,] -0.123216768
+ [87,] -0.106233452
+ [88,] -0.109825344
+ [89,] -0.049684630
+ [90,] -0.053702303
+ [91,] -0.171495575
+ [92,] -0.170873403
+ [93,] -0.173852336
+ [94,] -0.176162579
+ [95,] -0.126930528
+ [96,] -0.121688629
+ [97,] -0.096522520
+ [98,] -0.096358483
+ [99,] -0.104599476
+[100,] -0.084543364
+[101,] -0.086558587
+[102,] -0.087936646
+[103,]  0.007897278
+[104,]  0.006463572
+[105,] -0.199805275
+[106,] -0.198383092
+[107,] -0.172074604
+[108,] -0.174209084
+[109,] -0.074742951
+[110,] -0.085444430
+[111,] -0.086876509
+[112,] -0.085444430
+[113,] -0.086876509
+[114,] -0.082441784
+[115,] -0.082769521
+[116,] -0.164981085
+[117,] -0.160745522
+[118,] -0.162341071
+[119,] -0.162703882
+[120,] -0.162652742
+[121,] -0.162962135
+[122,] -0.161803432
+[123,] -0.162052256
+[124,] -0.159587888
+[125,] -0.160762891
+[126,] -0.124766159
+[127,] -0.124231931
+[128,] -0.123663868
+[129,] -0.122056672
+[130,] -0.123165845
+[131,] -0.192680718
+[132,] -0.189681214
+[133,] -0.191242393
+[134,] -0.192432399
+[135,] -0.192432399
+[136,] -0.195342748
+[137,] -0.195652134
+[138,] -0.189157759
+[139,] -0.195420661
+[140,] -0.195242529
+[141,] -0.210264277
+[142,] -0.215431752
+[143,] -0.012161315
+[144,] -0.011902941
+[145,] -0.203615739
+[146,] -0.197688424
+[147,] -0.110326252
+[148,] -0.186181219
+[149,] -0.185530570
+[150,] -0.184487182
+[151,] -0.182969310
+[152,] -0.183553357
+[153,] -0.057608616
+[154,] -0.065436110
+[155,] -0.066982223
+[156,] -0.039302129
+[157,] -0.044653018
+[158,] -0.045672028
+[159,] -0.084953603
+[160,] -0.090304493
+[161,] -0.091323502
+[162,] -0.146921708
+[163,] -0.150849907
+[164,] -0.156295315
+[165,] -0.131340108
+[166,] -0.133966110
+[167,] -0.134985120
+[168,] -0.111522411
+[169,] -0.113074600
+[170,] -0.055685536
+[171,] -0.057727266
+[172,] -0.177058158
+[173,] -0.179601256
+[174,] -0.183340225
+[175,] -0.207736512
+[176,] -0.176995927
+[177,] -0.179181308
+[178,] -0.107435401
+[179,] -0.126488124
+[180,] -0.155363613
+[181,] -0.056971836
+[182,] -0.133184112
+[183,] -0.127767727
+[184,] -0.098884303
+[185,] -0.193039482
+[186,] -0.201535024
+[187,] -0.189196707
+[188,] -0.157185282
+[189,] -0.142459994
+[190,] -0.131667383
+[191,] -0.146823214
+[192,] -0.335894809
+[193,] -0.182917130
+[194,] -0.168373537
+[195,] -0.189196707
+[196,] -0.193818452
+[197,] -0.129832066
+[198,] -0.016262772
+[199,] -0.019852576
+[200,] -0.023883730
+[201,] -0.027963484
+[202,] -0.036284940
+[203,] -0.040534855
+[204,] -0.044849855
+[205,] -0.049234312
+[206,] -0.053692762
+[207,] -0.058229926
+[208,] -0.067560414
+[209,] -0.082279011
+[210,] -0.088598751
+[211,] -0.089712393
+[212,] -0.090707542
+[213,] -0.173252443
+[214,]  0.006155354
+[215,]  0.006091254
+[216,]  0.005949128
+[217,] -0.215244325
+[218,] -0.175260135
+[219,] -0.176283624
+[220,] -0.077928482
+[221,] -0.123063707
+[222,] -0.161718836
+[223,] -0.102842358
+[224,] -0.086615744
+[225,] -0.125490655
+[226,] -0.128988649
+[227,] -0.129013978
+[228,] -0.116688142
+[229,] -0.173241643
+[230,] -0.190013371
+[231,] -0.217152902
+[232,] -0.218692050
+[233,] -0.228812323
+[234,] -0.126350632
+[235,] -0.131717127
+[236,] -0.131513040
+[237,] -0.128221565
+[238,] -0.130818784
+[239,]  0.022276904
+[240,] -0.012499949
+[241,] -0.012364340
+[242,] -0.019699175
+[243,] -0.029487914
+[244,] -0.029678543
+[245,] -0.029439630
+[246,] -0.145659119
+[247,] -0.179840060
+[248,] -0.210613074
+[249,] -0.207367408
+[250,] -0.096673737
+[251,] -0.110803605
+[252,] -0.110690153
+[253,] -0.140724579
+[254,] -0.183249916
+[255,] -0.187287615
+[256,] -0.086920873
+[257,] -0.252200700
+[258,] -0.050849618
+[259,] -0.096501092
+[260,] -0.103284013
+[261,] -0.165061514
+[262,] -0.176233965
+[263,] -0.187271078
+[264,] -0.221487561
+[265,] -0.179882744
+[266,] -0.181281755
+[267,] -0.182897955
+[268,] -0.211650214
+[269,] -0.216227212
+[270,] -0.200807872
+[271,] -0.093971289
+[272,] -0.061617214
+[273,]  0.012410957
+[274,] -0.151648721
+[275,] -0.230366078
+[276,] -0.221780948
+[277,] -0.218767242
+[278,] -0.140675779
+[279,] -0.043344126
+> 
+> plotMFs(anfis3)
+> 

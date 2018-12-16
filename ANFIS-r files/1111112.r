@@ -21,23 +21,33 @@ options(mc.cores=5)
 }
 
 membershipFunction<-list(
-x1m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.91,sigma=.2)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=-.25,sigma=.2))),
+x1m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-1.3,sigma=.3)),
+	#new(Class="NormalizedGaussianMF",parameters=c(mu=-0.5,sigma=.3)),
+      new(Class="NormalizedGaussianMF",parameters=c(mu=-.10,sigma=.3))),
 
-x2m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-1.3,sigma=0.4)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=.02,sigma=0.4))),
+x2m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-1.3,sigma=0.3)),
+	#new(Class="NormalizedGaussianMF",parameters=c(mu=-0.5,sigma=0.3)),
+	new(Class="NormalizedGaussianMF",parameters=c(mu=0.00,sigma=0.3))),
 
-x3m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.29,sigma=0.80))),
+x3m=c(#new(Class="NormalizedGaussianMF",parameters=c(mu=-1.2,sigma=0.3)),
+	#new(Class="NormalizedGaussianMF",parameters=c(mu=0   ,sigma=0.3)),
+	new(Class="NormalizedGaussianMF",parameters=c(mu=0.5 ,sigma=0.3))),
 
-x4m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.00,sigma=0.1)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=.24,sigma=0.1)),
-      new(Class="NormalizedGaussianMF",parameters=c(mu=.41,sigma=0.1))),
+x4m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-1  ,sigma=0.3)),
+	new(Class="NormalizedGaussianMF",parameters=c(mu=-0.2,sigma=0.3)),
+	new(Class="NormalizedGaussianMF",parameters=c(mu=.4  ,sigma=0.3))),
 
-x5m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.48,sigma=0.50))),
+x5m=c(#new(Class="NormalizedGaussianMF",parameters=c(mu=-1.2,sigma=0.3)),
+	#new(Class="NormalizedGaussianMF",parameters=c(mu=-0.5,sigma=0.3)),
+	#new(Class="NormalizedGaussianMF",parameters=c(mu=0.2 ,sigma=0.3))),
 
-x6m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=-.13,sigma=0.78))),
+x6m=c(#new(Class="NormalizedGaussianMF",parameters=c(mu=-.7,sigma=0.3)),
+	#new(Class="NormalizedGaussianMF",parameters=c(mu= 0 ,sigma=0.3)),
+	new(Class="NormalizedGaussianMF",parameters=c(mu= .6,sigma=0.3))),
 
-x7m=c(new(Class="NormalizedGaussianMF",parameters=c(mu=.27,sigma=0.5))))
+x7m=c(#new(Class="NormalizedGaussianMF",parameters=c(mu=-1.3,sigma=0.3)),
+	#new(Class="NormalizedGaussianMF",parameters=c(mu=-.4 ,sigma=0.3)),
+      new(Class="NormalizedGaussianMF",parameters=c(mu=.3  ,sigma=0.3))))
 
 X=MyData[,1:7]
 Y=MyData[,8,drop=FALSE]
@@ -61,12 +71,14 @@ trainOutput <- trainHybridJangOffLine(anfis3, epochs=10)
 summary(anfis3)
 coef(anfis3)
 
-predictedY <- predict(anfis3,X)
+predictedY <--0.05+10^( predict(anfis3,X))
+MyData$z=-0.05+10^(MyData$z)
 err=rmse(MyData$z-predictedY)
 err
 
 
-predictedY2 <- predict(anfis3,X2)
+predictedY2 <--0.05+10^( predict(anfis3,X2))
+MyData2$z=-0.05+10^(MyData2$z)
 err2=rmse(MyData2$z-predictedY2)
 err2
 
@@ -95,7 +107,7 @@ err2
 
 
 
-
+	dev.new()
 
 vars=7
 
