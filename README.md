@@ -1,7 +1,5 @@
 # Complex-Bridge-Pier-Scour-Calculator
 
-[![DOI](https://zenodo.org/badge/131510850.svg)](https://zenodo.org/badge/latestdoi/131510850)
-
 Visual Basic Application for calculating scour around bridge piers - supports several rows of data
 
 The explanation can be found in a paper entitled "Scour depth calculator explained in paper entitled "Estimating scour depth around complex piers using soft computing methods: A comparative study" by Danial Amini Baghbadorani1, Aliasghar Beheshti and Behzad Ataie-Ashtiani, Under consideration for publication in Journal of Waterway, Port, Coastal, and Ocean Engineering - ASCE, Dec. 2018"
