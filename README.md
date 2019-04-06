@@ -4,6 +4,8 @@ Google Sheets file is accessible from the following link:
 
 https://docs.google.com/spreadsheets/d/1TYURrLPNoJooO40jmqCcRC96xGcgURZBj2-6tmf_E_0/edit?usp=sharing
 
+The google sheets file can be viewed without the need for login with any Google account. In order to make edits, make a copy using your Google account to your own Google Docs, and then make edits. The scripts can also be accessed from either the GitHub repository, or through Tools menu/ Script editor. 
+
 Visual Basic Application:
 
 The VB app for calculating scour around bridge piers - supports several rows of data is explained below.
